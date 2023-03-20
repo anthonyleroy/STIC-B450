@@ -1,8 +1,9 @@
 # STIC-B450
 
 Algorithmes de tri:
-- TriParSelection
-- TriRapide
+- Tri par sélection
+- Tri rapide
+- Tri à bulles
 
 Les algorithmes sont implémentés en Processing.
 
