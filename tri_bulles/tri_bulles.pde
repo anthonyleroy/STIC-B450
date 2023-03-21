@@ -1,7 +1,7 @@
 boolean animContinue=true; //animation continue ou pas à pas
 boolean fini=false; //état terminé ou non du tri
 
-int nbElements=30; //nombre d'élément dans le vecteur
+int nbElements=200; //nombre d'élément dans le vecteur
 int minval=0; // valeur minimale
 int maxval=256; // valeur maximale
 int posCourante=0; // position courante
@@ -38,6 +38,7 @@ void setup() {
   
   //relève le moment où on commence à trier
   startTime=millis();
+  sine.play();
 }
 
 void draw() {
@@ -46,14 +47,12 @@ void draw() {
     keyPressed=false;
     background(255);
     textSize(32);
-    text("STIC-B450 - Algorithme de tri à bulle",40,50);
+    text("STIC-B450 - Algorithme de tri à bulles",40,50);
   
-    
-    visualize("Vecteur non trié",A,30,100,30,false); 
-    visualize("Vecteur trié par sélection",B,30,300,30,true);
+    visualize("Vecteur non trié",A, 30,100, map(width/nbElements, width/30, 0, 30,2),false); 
+    visualize("Vecteur trié par tri à bulles",B, 30, 300, map(width/nbElements, width/30, 0, 30,2),true);
+
     triBulle();
-    
-    sine.play();
   }
 }
 
@@ -65,7 +64,7 @@ void triBulle() {
         if (! fini) { 
           stopTime=millis();
           fini=true;
-      }
+        }
         sine.stop();
         text("Le vecteur a été trié en "+ str(stopTime-startTime)+ "ms !",40,450);
         text("Nombre de comparaisons réalisées: " + str(nbComparaisons),40,500);
@@ -77,7 +76,9 @@ void triBulle() {
   }
   else {
       posCourante++;
-  
+      if (animContinue) {
+            sine.freq(map(B[posCourante],0,maxval,80,800)); //génère un son de fréquence proportionnelle à la valeur
+      }
       if (B[posCourante-1]>B[posCourante]) { // l'élement précédent est l'élément le plus petit du vecteur
         
         // on intervertit les éléments  
@@ -123,15 +124,13 @@ void visualize(String caption,int[] values,float x,float y,float xstep,boolean s
       noStroke();
       triangle(x+(xstep*i)+5,y+10,x+(xstep*i),y+3,x+(xstep* i)+10,y+3); //affiche un curseur triangulaire élément précédent à comparer
     }
-    //if(i == posTri && showCursor) {
-    //  fill(color(25,25,112));
-    //  noStroke();
-    //  circle(x+(xstep*i)+4, y+8, 8); // affiche un curseur circulaire à l'emplacement du dernier élément trié
-    //}
+
     fill(0);
-    text(str(v), x+(xstep*i), y+25);
+    if (nbElements<100) {
+      text(str(v), x+(xstep*i), y+25);
+    }
     float h = map(v, minval, maxval, 10, 80); //dimensionne la hauteur de la barre en fonction de la valeur v
     fill(valueToColor(v)); //adapte la couleur en fonction de la valeur v
-    rect(x+(xstep*i), y+30, 10, h);
+    rect(x+(xstep*i), y+30, map(width/nbElements,width/30,0,10,1), h);
   }
 }

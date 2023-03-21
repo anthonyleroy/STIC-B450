@@ -28,7 +28,7 @@ IntList pivots;
  
  
 import processing.sound.*; //bibliothèque nécessaire pour produire du son
-Pulse pulse;
+SinOsc sine;
 
 import java.util.Arrays;
 import java.util.Stack;
@@ -55,6 +55,7 @@ void setup() {
   // création du vecteur à trier (nombres aléatoires entre minval et maxval)
   for (int i=0; i<nbElements; i++) {
      A[i]= (int) random (minval, maxval);
+     //A[i]=i; //pire cas: le pivot est toujours l'élément maximal et partitionne en N-1 éléments d'un côté, 1 élément de l'autre 
   }
  
   //copie le vecteur à trier A dans le vecteur unsorted
@@ -64,8 +65,8 @@ void setup() {
   posCourante=0;
   posTri = 0;
   
-  // initialise l'oscillateur pour produire du son
-  pulse = new Pulse(this);
+   // initialise l'oscillateur pour produire du son
+  sine = new SinOsc(this);
   
   
   // pousse l'index de début et de fin du array dans la stack
@@ -75,6 +76,7 @@ void setup() {
   
   //relève le moment où on commence à trier
   startTime=millis();
+  sine.play();
 }
 
 public void swap (int[] arr, int i, int j)
@@ -100,6 +102,10 @@ public int partition(int a[], int start, int end)
         // avant le pivot.
         for (int i = start; i < end; i++)
         {
+          
+          if (animContinue) {
+            sine.freq(map(a[i],0,maxval,80,800)); //génère un son de fréquence proportionnelle à la valeur
+          }
             if (a[i] <= pivot)
             {
                 swap(a, i, pIndex);
@@ -122,7 +128,7 @@ void draw() {
     background(255);
     text("STIC-B450 - Algorithme de tri rapide (quicksort)",40,50);
   
-    visualize("Vecteur non trié",A,30,100,30,false); 
+    visualize("Vecteur non trié",A,30,100, map(width/nbElements, width/30,0, 30,1),false); 
     
         // boucle jusqu'à ce que la stack soit vide
         if (!stack.empty())
@@ -154,6 +160,7 @@ void draw() {
          if (! fini) {
             stopTime=millis();
             fini=true;
+            sine.stop();
           }
           if (animContinue){
             text("Le vecteur a été trié en "+ str(stopTime-startTime)+ "ms !",40,450);
@@ -161,7 +168,7 @@ void draw() {
             text("Nombre d'échanges réalisés: "+str(nbEchanges),40,530);
           }
         };
-        visualize("Vecteur trié par tri rapide (quicksort)",B,30,300,30,true);
+        visualize("Vecteur trié par tri rapide (quicksort)",B,30,300, map(width/nbElements, width/30,0, 30,1),true);
     }
 }
 
@@ -207,9 +214,11 @@ void visualize(String caption,int[] values,float x,float y,float xstep,boolean s
     //  circle(x+(xstep*i)+4, y+8, 8); // affiche un curseur circulaire à l'emplacement du dernier élément trié
     //}
     fill(0);
-    text(str(v), x+(xstep*i), y+25);
+    if (nbElements<100) {
+      text(str(v), x+(xstep*i), y+25);
+    }
     float h = map(v, minval, maxval, 10, 80); //dimensionne la hauteur de la barre en fonction de la valeur v
     fill(valueToColor(v)); //adapte la couleur en fonction de la valeur v
-    rect(x+(xstep*i), y+30, 10, h);
+    rect(x+(xstep*i), y+30, map(width/nbElements,width/30,0,10,1), h);
   }
 }
