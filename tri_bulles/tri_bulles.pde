@@ -1,7 +1,7 @@
-boolean animContinue=true; //animation continue ou pas à pas
+boolean animContinue=false; //animation continue ou pas à pas
 boolean fini=false; //état terminé ou non du tri
 
-int nbElements=200; //nombre d'élément dans le vecteur
+int nbElements=30; //nombre d'élément dans le vecteur
 int minval=0; // valeur minimale
 int maxval=256; // valeur maximale
 int posCourante=0; // position courante
@@ -14,6 +14,7 @@ int startTime=0; //temps au début du tri
 int stopTime=0; //temps lorsque le tri est terminé
 int nbComparaisons=0; //comptabilise les comparaisons réalisées
 int nbEchanges=0; //comptabilise les échanges d'éléments réalisés
+
 
 import processing.sound.*; //bibliothèque nécessaire pour produire du son
 SinOsc sine;
@@ -38,7 +39,19 @@ void setup() {
   
   //relève le moment où on commence à trier
   startTime=millis();
-  sine.play();
+
+  if (animContinue) {
+    sine.play();
+  }
+  
+  background(255);
+  textSize(32);
+  fill(0);
+  text("STIC-B450 - Algorithme de tri à bulles",40,50);
+  
+  visualize("Vecteur non trié",A, 30,100, map(width/nbElements, width/30, 0, 30,2),false); 
+  visualize("Vecteur trié par tri à bulles",B, 30, 300, map(width/nbElements, width/30, 0, 30,2),true);
+
 }
 
 void draw() {
@@ -95,7 +108,6 @@ void triBulle() {
    
 }
 
-
 color valueToColor(int valeur) {
   // calcule une couleur intermédiaire entre bleu clair et bleu foncé en fonction de la valeur entière  
   return lerpColor(color(135,206,250), color(0,0,139), float(valeur)/maxval);
@@ -110,9 +122,7 @@ void visualize(String caption,int[] values,float x,float y,float xstep,boolean s
   for (int i=0; i < values.length; i++){
     int v = values[i];
     if (animContinue) {
-      sine.stop();
       sine.freq(100+float(v)/maxval*1000); //génère un son de fréquence proportionnelle à la valeur
-      sine.play();
     }
     if (i == posCourante && showCursor){ 
         fill(color(255,165,0));
@@ -126,7 +136,7 @@ void visualize(String caption,int[] values,float x,float y,float xstep,boolean s
     }
 
     fill(0);
-    if (nbElements<100) {
+    if (nbElements<=30) {
       text(str(v), x+(xstep*i), y+25);
     }
     float h = map(v, minval, maxval, 10, 80); //dimensionne la hauteur de la barre en fonction de la valeur v

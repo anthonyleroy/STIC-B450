@@ -1,7 +1,7 @@
 boolean animContinue=true; //animation continue ou pas à pas
 boolean fini=false; //état terminé ou non du tri
 
-int nbElements=100; //nombre d'élément dans le vecteur
+int nbElements=30; //nombre d'élément dans le vecteur
 int minval=0; // valeur minimale
 int maxval=256; // valeur maximale
 int posCourante=0; // position courante
@@ -41,13 +41,24 @@ void setup() {
   
   //relève le moment où on commence à trier
   startTime=millis();
-  sine.play();
+  if (animContinue) {
+    sine.play();
+  }
+  background(255);
+  fill(0);
+  textSize(32);
+  text("STIC-B450 - Algorithme de tri par sélection",40,50);
+  
+  visualize("Vecteur non trié",A, 30,100, map(width/nbElements, width/30, 0, 30,2),false); 
+  visualize("Vecteur trié par sélection",B, 30, 300, map(width/nbElements, width/30, 0, 30,2),true);
+    
 }
 
 void draw() {
   if(keyPressed||animContinue) {
     keyPressed=false;
     background(255);
+    fill(0);
     textSize(32);
     text("STIC-B450 - Algorithme de tri par sélection",40,50);
   
@@ -90,11 +101,14 @@ void triParSelection() {
     posCourante=posTri; // on replace le curseur en début de partie non triée
     posMinimum=posTri; // on replace le curseur min en début de partie non triée
   }
+  
+  else   posCourante++;
+  
   if (animContinue) {
       sine.freq(map(B[posCourante],0,maxval,80,800)); //génère un son de fréquence proportionnelle à la valeur
   }
     
-  posCourante++;
+
 }
 
 
@@ -127,11 +141,11 @@ void visualize(String caption,int[] values,float x,float y,float xstep,boolean s
       circle(x+(xstep*i)+4, y+8, 8); // affiche un curseur circulaire à l'emplacement du dernier élément trié
     }
     fill(0);
-    if (nbElements<100) {
+    if (nbElements<=30) {
       text(str(v), x+(xstep*i), y+25);
     }
     float h = map(v, minval, maxval, 10, 80); //dimensionne la hauteur de la barre en fonction de la valeur v
     fill(valueToColor(v)); //adapte la couleur en fonction de la valeur v
-    rect(x+(xstep*i), y+30, map(width/nbElements,0,width/30,10,1), h);
+    rect(x+(xstep*i), y+30, map(width/nbElements,width/30,0,10,1), h);
   }
 }

@@ -19,8 +19,8 @@ int nbEchanges=0; //comptabilise les échanges d'éléments réalisés
 IntList pivots;
     
  // récupère l'index de début et de fin du array donné
-  int start = 0;
-  int end = B.length - 1;
+  int ssVecStart = 0;
+  int ssVecEnd = B.length - 1;
  
  
  // crée une stack pour stocker l'index de début et de fin de subarray
@@ -70,13 +70,25 @@ void setup() {
   
   
   // pousse l'index de début et de fin du array dans la stack
-  stack.push(new Pair(start, end));
+  stack.push(new Pair(ssVecStart, ssVecEnd));
   
   pivots= new IntList();
   
   //relève le moment où on commence à trier
   startTime=millis();
-  sine.play();
+  
+  if (animContinue) {
+    sine.play();
+  }
+  
+  fill(0);
+  textSize(32);
+  background(255);
+  text("STIC-B450 - Algorithme de tri rapide (quicksort)",40,50);
+  
+  visualize("Vecteur non trié",A,30,100, map(width/nbElements, width/30,0, 30,1),false); 
+  visualize("Vecteur trié par tri rapide (quicksort)",B,30,300, map(width/nbElements, width/30,0, 30,1),true);
+  
 }
 
 public void swap (int[] arr, int i, int j)
@@ -87,20 +99,20 @@ public void swap (int[] arr, int i, int j)
         nbEchanges++;
     }
     
-public int partition(int a[], int start, int end)
+public int partition(int a[], int ssVecStart, int ssVecEnd)
     {
         // Choisissez l'élément le plus à droite comme pivot dans le array
-        int pivot = a[end];
+        int pivot = a[ssVecEnd];
  
         // les éléments inférieurs au pivot iront à gauche de `pIndex`
         // les éléments plus que le pivot iront à droite de `pIndex`
         // les éléments égaux peuvent aller dans les deux sens
-        int pIndex = start;
+        int pIndex = ssVecStart;
  
         // à chaque fois qu'on trouve un élément inférieur ou égal au pivot,
         // `pIndex` est incrémenté, et cet élément serait placé
         // avant le pivot.
-        for (int i = start; i < end; i++)
+        for (int i = ssVecStart; i < ssVecEnd; i++)
         {
           
           if (animContinue) {
@@ -115,7 +127,7 @@ public int partition(int a[], int start, int end)
         }
  
         // échange `pIndex` avec pivot
-        swap (a, pIndex, end);
+        swap (a, pIndex, ssVecEnd);
  
         // renvoie `pIndex` (index de l'élément pivot)
         return pIndex;
@@ -124,6 +136,7 @@ public int partition(int a[], int start, int end)
 void draw() {
     if(keyPressed||animContinue) {
     keyPressed=false;
+    fill(0);
     textSize(32);
     background(255);
     text("STIC-B450 - Algorithme de tri rapide (quicksort)",40,50);
@@ -135,23 +148,23 @@ void draw() {
         {
             // supprimer la paire supérieure de la liste et faire démarrer le subarray
             // et indices de fin
-            start = stack.peek().getX();
-            end = stack.peek().getY();
+            ssVecStart = stack.peek().getX();
+            ssVecEnd = stack.peek().getY();
             stack.pop();
  
             // réarrange les éléments sur le pivot
-            int pivot = partition(B, start, end);
+            int pivot = partition(B, ssVecStart, ssVecEnd);
  
             // pousse les indices de subarrayx contenant des éléments qui sont
             // moins que le pivot actuel pour stack
-            if (pivot - 1 > start) {
-                stack.push(new Pair(start, pivot - 1));
+            if (pivot - 1 > ssVecStart) {
+                stack.push(new Pair(ssVecStart, pivot - 1));
             }
  
             // pousse les indices de subarrayx contenant des éléments qui sont
             // plus que le pivot actuel pour stack
-            if (pivot + 1 < end) {
-                stack.push(new Pair(pivot + 1, end));
+            if (pivot + 1 < ssVecEnd) {
+                stack.push(new Pair(pivot + 1, ssVecEnd));
             }
             pivots.append(pivot);
 
@@ -189,9 +202,10 @@ void visualize(String caption,int[] values,float x,float y,float xstep,boolean s
     rectMode(CORNERS);
     fill(color(255,165,0));
     noStroke();
-    rect(x+(xstep*start)+5, y+10, x+(xstep*end)+5, y+12);
+    rect(x+(xstep*ssVecStart)+5, y+10, x+(xstep*ssVecEnd)+5, y+12);
     rectMode(CORNER);
   }  
+  
   for (int i=0; i < values.length; i++){
     int v = values[i];
     //pulse.play(100+float(v)/maxval*1000, 1.0); //génère un son de fréquence proportionnelle à la valeur
@@ -214,7 +228,7 @@ void visualize(String caption,int[] values,float x,float y,float xstep,boolean s
     //  circle(x+(xstep*i)+4, y+8, 8); // affiche un curseur circulaire à l'emplacement du dernier élément trié
     //}
     fill(0);
-    if (nbElements<100) {
+    if (nbElements<=30) {
       text(str(v), x+(xstep*i), y+25);
     }
     float h = map(v, minval, maxval, 10, 80); //dimensionne la hauteur de la barre en fonction de la valeur v
