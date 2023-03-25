@@ -151,7 +151,7 @@ void setup() {
   
   //simule le fait d'avoir pressé sur le bouton nouveau pour créer un nouveau vecteur prêt à être trié
   nouveau(0);
-  l.setValue(1);
+  l.setValue(0);
   
 }
 
@@ -197,6 +197,9 @@ public void pause(int valeur) {
     } else {
       start=true;
       pauseButton.setCaptionLabel("pause");
+      //relève le moment où on commence à trier
+      startTime=millis();
+
     }
 
     // si bouton pressé (valeur=0) alors que pas à pas, relance l'animation continue
@@ -259,6 +262,9 @@ public void nouveau(int valeur) {
     //rétabli l'animation continue par défaut
     animContinue=true;
     
+
+    fini=false;
+    
     // si Tri rapide: pousse l'index de début et de fin du array dans la stack
     if (typeTri==TRI_QUICKSORT) {
       ssVecStart = 0;
@@ -268,8 +274,6 @@ public void nouveau(int valeur) {
       pivots= new IntList();
     }
  
-    //relève le moment où on commence à trier
-    startTime=millis();
   }
 }
 
@@ -304,12 +308,13 @@ public void reinit(int valeur) {
       stack.push(new Pair(ssVecStart, ssVecEnd));
       pivots = new IntList();
     }
+
+    //réinitialise variable fini à false
+    fini=false;
     
     //rétabli l'animation continue par défaut
     animContinue=true;
 
-    //relève le moment où on commence à trier
-    startTime=millis();
   }
 }
 
