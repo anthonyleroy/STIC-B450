@@ -35,6 +35,13 @@ final int TRI_PAR_SELECTION=0;
 final int TRI_A_BULLES=1;
 final int TRI_QUICKSORT=2;
 
+//couleurs 
+final color couleurPosMin = color(255,0,0);
+final color couleurPosTri = color(25, 25, 112);
+final color couleurPosCourante = color(255, 165, 0);
+final color couleurSsVecteur = color(255,0,0);
+final color couleurPivot = color(255, 165, 0);
+
 String nomsTypeTri [] = {"Tri par selection", "Tri a bulles", "Tri rapide"};
 
 // type de tri en cours
@@ -42,6 +49,9 @@ int typeTri=TRI_PAR_SELECTION;
 
 // varaiables spécifiques au tri rapide
 IntList pivots;
+int pivot=0;
+int pIndex=0;
+boolean triEnCours=false;
 
 // index début et fin du sous-vecteur en cours
 int ssVecStart = 0;
@@ -171,6 +181,40 @@ void draw() {
   visualize("Vecteur non trié", A, 10, 200, map(width/nbElements, width/30, 0, 30, 1), false);
   visualize("Vecteur trié par "+ nomsTypeTri[typeTri], B, 10, 400, map(width/nbElements, width/30, 0, 30, 1), true);
 
+  // légendes  des curseurs
+
+  // Curseur PosTri
+  fill(couleurPosTri);
+  circle(605, 650, 8); // affiche un curseur circulaire à l'emplacement du dernier élément trié
+  fill(0);
+  text ("Début du sous-vecteur à trier",620, 654);
+
+  // Curseur PosCourante
+  fill(couleurPosCourante);
+  rect(601, 670, 8, 8); // affiche un curseur rectangulaire à la position courante
+  fill(0);
+  text ("Position courante dans le vecteur",620, 678);
+
+  // Curseur PosMin (signification dépendante du type de tri sélectionné)
+  fill(couleurPosMin);
+  triangle(605, 700, 600, 693, 610, 693);
+  fill(0);
+  String labelPosMin = "";
+  switch(typeTri) {
+      case TRI_PAR_SELECTION:
+        labelPosMin = "Position de l'élément minimum rencontré";
+        break;
+      case TRI_A_BULLES:
+        labelPosMin = "Position de l'élément à comparer";
+        break;
+      case TRI_QUICKSORT:
+        labelPosMin = "Premier élément rencontré > pivot (à échanger avec élement plus petit ou égal au pivot)";
+        break;
+      default:
+        labelPosMin = "";
+  }
+  text(labelPosMin,620, 700);  
+  
   if (start) {
     if (keyPressed||animContinue) {
       keyPressed=false;
@@ -411,9 +455,6 @@ void triBulles() {
   }
 }
 
-int pivot=0;
-int pIndex=0;
-boolean triEnCours=false;
 
 //
 // tri quicksort
@@ -422,13 +463,12 @@ public void triRapide() {
 
   // en début de sous-vecteur à trier
   if (!triEnCours && !stack.empty()) {
-    // supprimer la paire supérieure de la liste et faire démarrer le subarray
-    // et indices de fin
+    // supprime la paire supérieure de la liste et prend les indices du sous-vecteur à trier
     ssVecStart = stack.peek().getX();
     ssVecEnd = stack.peek().getY();
     stack.pop();
 
-    // On prend l'élément le plus à droite comme pivot dans le array
+    // prend l'élément le plus à droite comme pivot dans le vecteur
     pivot = B[ssVecEnd];
 
     // les éléments inférieurs au pivot iront à gauche de `pIndex`
@@ -436,6 +476,7 @@ public void triRapide() {
     // les éléments égaux peuvent aller dans les deux sens
     pIndex = ssVecStart;
     posCourante=ssVecStart;
+    posTri=ssVecStart;
     triEnCours=true;
   }
 
@@ -475,7 +516,7 @@ public void triRapide() {
       nbEchanges++;
 
       // renvoie `pIndex` (index de l'élément pivot)
-      pivot= pIndex;
+      pivot=pIndex;
 
       // pousse les indices de subarrayx contenant des éléments qui sont
       // moins que le pivot actuel pour stack
@@ -527,37 +568,48 @@ void visualize(String caption, int[] values, float x, float y, float xstep, bool
   for (int i=0; i < values.length; i++) {
     int v = values[i];
     if (i == posCourante && showCursor) {
-      fill(color(255, 165, 0));
+      fill(couleurPosCourante);
       noStroke();
       rect(x+(xstep*i), y+3, 8, 8); // affiche un curseur rectangulaire à la position courante
     } else if (i == posMinimum && showCursor) {
-      fill(color(255, 0, 0));
+      fill(couleurPosMin);
       noStroke();
       triangle(x+(xstep*i)+5, y+10, x+(xstep*i), y+3, x+(xstep* i)+10, y+3); //affiche un curseur triangulaire valeur minimum
     }
     if (i == posTri && showCursor) {
-      fill(color(25, 25, 112));
+      fill(couleurPosTri);
       noStroke();
       circle(x+(xstep*i)+4, y+8, 8); // affiche un curseur circulaire à l'emplacement du dernier élément trié
     }
 
-    // met en évidence le sous-vecteur en cours de tri
-    if (typeTri==TRI_QUICKSORT && showCursor && pivots != null && pivots.size()>0) {
-      rectMode(CORNERS);
-      fill(color(255, 0, 0));
-      noStroke();
-      // calcule la hauteur de l'élément pivot
-      int hauteurPivot=(int)map(B[pivots.get(pivots.size()-1)], minval, maxval, 10, 80);
-      // dessine une ligne de 2 pixels d'épaisseur à hauteur du pivot sur le sous-vecteur en cours
-      rect(x+(xstep*ssVecStart)+5, y+hauteurPivot+30, x+(xstep*ssVecEnd)+5, y+hauteurPivot+32);
-      rectMode(CORNER);
+    // indicateurs spécifique au tri rapide
+    if (typeTri==TRI_QUICKSORT && showCursor  ) {
+      
+      // affiche le sous-vecteur en cours de tri
+      if (triEnCours) {
+        rectMode(CORNERS);
+        fill(couleurSsVecteur);
+        noStroke();
+        // calcule la hauteur de l'élément pivot
+        int hauteurPivot=(int)map(B[ssVecEnd], minval, maxval, 10, 80);
+        // dessine une ligne de 2 pixels d'épaisseur à hauteur du pivot sur le sous-vecteur en cours
+        rect(x+(xstep*ssVecStart)+5, y+hauteurPivot+30, x+(xstep*ssVecEnd)+5, y+hauteurPivot+32);
+        rectMode(CORNER);
+      }
 
+     if (i == pIndex && showCursor) {
+        fill(couleurPosMin);
+        noStroke();
+        //affiche un curseur triangulaire à la première valeur > pivot qui devra être échangé avec une valeur plus petite que le pivot
+        triangle(x+(xstep*i)+5, y+10, x+(xstep*i), y+3, x+(xstep* i)+10, y+3); 
+      }
+      // affiche tous les pivots déjà utilisés
       if (pivots != null && pivots.hasValue(i)) {
-        fill(color(255, 165, 0));
+        fill(couleurPivot);
         noStroke();
         //rect(x+(xstep*i), y+3, 8, 8); // affiche un curseur rectangulaire à la position courante
         triangle(x+(xstep*i)+5, y+10, x+(xstep*i), y+3, x+(xstep* i)+10, y+3); //affiche un curseur triangulaire valeur pivot
-      }
+      } 
     }
 
     fill(0);
@@ -567,9 +619,9 @@ void visualize(String caption, int[] values, float x, float y, float xstep, bool
     float h = map(v, minval, maxval, 10, 80); //dimensionne la hauteur de la barre en fonction de la valeur v
     fill(valueToColor(v)); //adapte la couleur en fonction de la valeur v
 
-    // si tri quicksort, afficher le pivot en cours en orange
+    // si tri quicksort, afficher le pivot en cours
     if (typeTri==TRI_QUICKSORT && i==ssVecEnd && showCursor) {
-      fill(color(255, 165, 0));
+      fill(couleurPivot);
     }
     rect(x+(xstep*i), y+30, map(width/nbElements, width/30, 1, 10, 1), h);
   }
