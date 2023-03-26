@@ -270,6 +270,7 @@ public void nouveau(int valeur) {
     // si Tri rapide: pousse l'index de début et de fin du array dans la stack
     if (typeTri==TRI_QUICKSORT) {
       ssVecStart = 0;
+      posCourante=0;
       ssVecEnd = nbElements - 1;
       stack = new Stack<>(); //vide la stack
       stack.push(new Pair(ssVecStart, ssVecEnd));
@@ -304,10 +305,11 @@ public void reinit(int valeur) {
     // si Tri rapide: pousse l'index de début et de fin du array dans la stack
     if (typeTri==TRI_QUICKSORT) {
       ssVecStart = 0;
+      posCourante=0;
       ssVecEnd = nbElements - 1;
-      stack = new Stack<>(); //vide la stack
+      stack = new Stack<>(); //crée nouvelle stack
       stack.push(new Pair(ssVecStart, ssVecEnd));
-      pivots = new IntList();
+      pivots = new IntList(); // réinitialise la liste des pivots (pour affichage)
     }
 
     //réinitialise variable fini à false
@@ -409,13 +411,17 @@ void triBulles() {
   }
 }
 
+int pivot=0;
+int pIndex=0;
+boolean triEnCours=false;
+
 //
 // tri quicksort
 //
 public void triRapide() {
-  // boucle jusqu'à ce que la stack soit vide
-  if (!stack.empty())
-  {
+
+  // en début de sous-vecteur à trier
+  if (!triEnCours && !stack.empty()) {
     // supprimer la paire supérieure de la liste et faire démarrer le subarray
     // et indices de fin
     ssVecStart = stack.peek().getX();
@@ -423,22 +429,33 @@ public void triRapide() {
     stack.pop();
 
     // On prend l'élément le plus à droite comme pivot dans le array
-    int pivot = B[ssVecEnd];
+    pivot = B[ssVecEnd];
 
     // les éléments inférieurs au pivot iront à gauche de `pIndex`
     // les éléments plus que le pivot iront à droite de `pIndex`
     // les éléments égaux peuvent aller dans les deux sens
-    int pIndex = ssVecStart;
+    pIndex = ssVecStart;
+    posCourante=ssVecStart;
+    triEnCours=true;
+  }
+
+  // continue tant que le tri est en cours
+  if (triEnCours)
+  {
+
+    println("vec start" + ssVecStart);
+    println("vec end" + ssVecEnd);
+
 
     // à chaque fois qu'on trouve un élément inférieur ou égal au pivot,
     // `pIndex` est incrémenté, et cet élément est placé avant le pivot.
-    for (int posCourante = ssVecStart; posCourante < ssVecEnd; posCourante++)
-    {
+    if (posCourante <= ssVecEnd) {
 
       if (son) {
         //génère un son de fréquence proportionnelle à la valeur de l'élément en cours
-        sine.freq(map(B[posCourante], 0, maxval, 80, 800)); 
+        sine.freq(map(B[posCourante], 0, maxval, 80, 800));
       }
+
       if (B[posCourante] <= pivot)
       {
         int temp = B[posCourante];
@@ -449,54 +466,56 @@ public void triRapide() {
         pIndex++;
       }
       nbComparaisons++;
+      posCourante++;
     }
 
-    // échange `pIndex` avec pivot
-    //swap (a, pIndex, ssVecEnd);
-    int temp = B[pIndex];
-    B[pIndex] = B[ssVecEnd];
-    B[ssVecEnd] = temp;
+    // arrivé en fin de sous-vecteur à trier
+    if (posCourante == ssVecEnd) {
+      // échange `pIndex` avec pivot
+      int temp = B[pIndex];
+      B[pIndex] = B[ssVecEnd];
+      B[ssVecEnd] = temp;
 
-    nbEchanges++;
+      nbEchanges++;
 
-    // renvoie `pIndex` (index de l'élément pivot)
-    pivot= pIndex;
+      // renvoie `pIndex` (index de l'élément pivot)
+      pivot= pIndex;
 
+      // pousse les indices de subarrayx contenant des éléments qui sont
+      // moins que le pivot actuel pour stack
+      if (pivot - 1 > ssVecStart) {
+        stack.push(new Pair(ssVecStart, pivot - 1));
+      }
 
-    // pousse les indices de subarrayx contenant des éléments qui sont
-    // moins que le pivot actuel pour stack
-    if (pivot - 1 > ssVecStart) {
-      stack.push(new Pair(ssVecStart, pivot - 1));
+      // pousse les indices de subarrayx contenant des éléments qui sont
+      // plus que le pivot actuel pour stack
+      if (pivot + 1 < ssVecEnd) {
+        stack.push(new Pair(pivot + 1, ssVecEnd));
+      }
+
+      //rajoute le pivot à la liste des pivots utilisés (pour affichage)
+      pivots.append(pivot);
+      triEnCours=false;
     }
-
-    // pousse les indices de subarrayx contenant des éléments qui sont
-    // plus que le pivot actuel pour stack
-    if (pivot + 1 < ssVecEnd) {
-      stack.push(new Pair(pivot + 1, ssVecEnd));
-    }
-    
-    //rajoute le pivot à la liste des pivots utilisés (pour affichage)
-    pivots.append(pivot);
-    
   } else {
-    if (! fini) {
-      stopTime=millis();
-      fini=true;
-      sine.stop();
+    if (stack.empty()) {
+
+      if (! fini) {
+        stopTime=millis();
+        fini=true;
+        sine.stop();
+      }
+      text("Le vecteur a été trié en "+ str(stopTime-startTime)+ "ms !", 40, 650);
+      text("Nombre de comparaisons réalisées: " + str(nbComparaisons), 40, 700);
+      text("Nombre d'échanges réalisés: "+str(nbEchanges), 40, 730);
+      text("Nombre de pivots utilisés: " + str(pivots.size()), 40, 760);
     }
-    text("Le vecteur a été trié en "+ str(stopTime-startTime)+ "ms !", 40, 650);
-    text("Nombre de comparaisons réalisées: " + str(nbComparaisons), 40, 700);
-    text("Nombre d'échanges réalisés: "+str(nbEchanges), 40, 730);
-    text("Nombre de pivots utilisés: " + str(pivots.size()), 40, 760);
   };
 
   if (!animContinue) {
     pause(1);  //envoie la valeur 1 pour distinguer d'une pression du bouton
   }
 }
-
-
-
 
 color valueToColor(int valeur) {
   // calcule une couleur intermédiaire entre bleu clair et bleu foncé en fonction de la valeur entière
