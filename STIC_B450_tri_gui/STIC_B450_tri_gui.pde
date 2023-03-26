@@ -443,10 +443,6 @@ public void triRapide() {
   if (triEnCours)
   {
 
-    println("vec start" + ssVecStart);
-    println("vec end" + ssVecEnd);
-
-
     // à chaque fois qu'on trouve un élément inférieur ou égal au pivot,
     // `pIndex` est incrémenté, et cet élément est placé avant le pivot.
     if (posCourante <= ssVecEnd) {
