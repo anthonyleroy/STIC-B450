@@ -1,7 +1,7 @@
 //paramètres du vecteur
 int nbElements=30; //nombre d'élément dans le vecteur
 int minval=0; // valeur minimale
-int maxval=256; // valeur maximale
+int maxval=255; // valeur maximale
 
 // indices dans le vecteur
 int posCourante=0; // position courante
@@ -18,7 +18,6 @@ int startTime=0; //temps au début du tri
 int stopTime=0; //temps lorsque le tri est terminé
 int nbComparaisons=0; //comptabilise les comparaisons réalisées
 int nbEchanges=0; //comptabilise les échanges d'éléments réalisés
-
 
 // variables d'état
 boolean start=false;
@@ -41,6 +40,7 @@ final color couleurPosTri = color(25, 25, 112);
 final color couleurPosCourante = color(255, 165, 0);
 final color couleurSsVecteur = color(255,0,0);
 final color couleurPivot = color(255, 165, 0);
+
 
 String nomsTypeTri [] = {"Tri par selection", "Tri a bulles", "Tri rapide"};
 
@@ -237,7 +237,7 @@ void draw() {
 }
 
 public void pause(int valeur) {
-  if (init) {
+  if (init) { //pas d'execution tant que setup n'est pas terminé
     if (start) {
       start=false;
       pauseButton.setCaptionLabel("start");
@@ -275,7 +275,7 @@ void keyPressed() {
 }
 
 public void nouveau(int valeur) {
-  if (init) {
+  if (init) { //pas d'execution tant que setup n'est pas terminé
     start=false; // arrête le tri en cours
     pauseButton.setCaptionLabel("start");
 
@@ -328,7 +328,7 @@ public void nouveau(int valeur) {
 
 
 public void reinit(int valeur) {
-  if (init) {
+  if (init) { //pas d'execution tant que setup n'est pas terminé
     start=false;
     this.B = new int[nbElements]; //vecteur original (non trié)
 
@@ -344,7 +344,6 @@ public void reinit(int valeur) {
     typeTri=(int)l.getValue();
 
     //reinitialisation des métriques
-
     stopTime=0; //temps lorsque le tri est terminé
     nbComparaisons=0; //comptabilise les comparaisons réalisées
     nbEchanges=0; //comptabilise les échanges d'éléments réalisés
