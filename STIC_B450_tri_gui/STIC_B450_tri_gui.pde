@@ -315,6 +315,9 @@ public void nouveau(int valeur) {
     if (typeTri==TRI_QUICKSORT) {
       ssVecStart = 0;
       posCourante=0;
+      pivot=0;
+      pIndex=0;
+      triEnCours=false;
       ssVecEnd = nbElements - 1;
       stack = new Stack<>(); //vide la stack
       stack.push(new Pair(ssVecStart, ssVecEnd));
@@ -350,10 +353,13 @@ public void reinit(int valeur) {
     if (typeTri==TRI_QUICKSORT) {
       ssVecStart = 0;
       posCourante=0;
+      pivot=0;
+      pIndex=0;
+      triEnCours=false;
       ssVecEnd = nbElements - 1;
-      stack = new Stack<>(); //crée nouvelle stack
+      stack = new Stack<>(); //vide la stack
       stack.push(new Pair(ssVecStart, ssVecEnd));
-      pivots = new IntList(); // réinitialise la liste des pivots (pour affichage)
+      pivots= new IntList(); // réinitialise la liste des pivots (pour affichage)
     }
 
     //réinitialise variable fini à false
