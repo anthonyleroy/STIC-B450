@@ -61,12 +61,10 @@ class Pair
 {
   private final int x;
   private final int y;
-
   Pair(int x, int y) {
     this.x = x;
     this.y = y;
   }
-
   public int getX() {
     return x;
   }
@@ -74,7 +72,6 @@ class Pair
     return y;
   }
 }
-
 
 // crée une stack pour stocker l'index de début et de fin de subarray
 import java.util.Arrays;
@@ -366,6 +363,7 @@ public void reinit(int valeur) {
 
     //rétabli l'animation continue par défaut
     animContinue=true;
+    
   }
 }
 
@@ -486,8 +484,7 @@ public void triRapide() {
   }
 
   // continue tant que le tri est en cours
-  if (triEnCours)
-  {
+  if (triEnCours) {
 
     // à chaque fois qu'on trouve un élément inférieur ou égal au pivot,
     // `pIndex` est incrémenté, et cet élément est placé avant le pivot.
@@ -539,7 +536,8 @@ public void triRapide() {
       pivots.append(pivot);
       triEnCours=false;
     }
-  } else {
+  } 
+  else {
     if (stack.empty()) {
 
       if (! fini) {
