@@ -24,7 +24,7 @@ boolean start=false;
 boolean init=false; // indique si setup() a été executé ou non
 boolean animContinue=true; //animation continue ou pas à pas
 boolean fini=false; //état terminé ou non du tri
-boolean son=false; // diffuser du son ou non
+boolean sonActif=false; // diffuser du son ou non
 
 // variable correspondant au sélectionneur de taille de vecteur
 int nbElementsSelection=nbElements;
@@ -123,10 +123,10 @@ void setup() {
     .setValue(0)
     .setPosition(1300, 70)
     .setSize(50, 19);
-  pauseButton.setCaptionLabel("start");
+  pauseButton.setCaptionLabel("avancer");
 
   // bouton pour activer ou désactiver le son
-  cp5.addButton("sound")
+  cp5.addButton("son")
     .setValue(0)
     .setPosition(1300, 95)
     .setSize(50, 19);
@@ -237,7 +237,7 @@ public void pause(int valeur) {
   if (init) { //pas d'execution tant que setup n'est pas terminé
     if (start) {
       start=false;
-      pauseButton.setCaptionLabel("start");
+      pauseButton.setCaptionLabel("avancer");
     } else {
       start=true;
       pauseButton.setCaptionLabel("pause");
@@ -254,13 +254,13 @@ public void pause(int valeur) {
   }
 }
 
-public void sound(int valeur) {
+public void son(int valeur) {
   if (init) {
-    if (son) {
-      son=false;
+    if (sonActif) {
+      sonActif=false;
       sine.stop();
     } else {
-      son=true;
+      sonActif=true;
       sine.play();
     }
   }
@@ -274,7 +274,7 @@ void keyPressed() {
 public void nouveau(int valeur) {
   if (init) { //pas d'execution tant que setup n'est pas terminé
     start=false; // arrête le tri en cours
-    pauseButton.setCaptionLabel("start");
+    pauseButton.setCaptionLabel("avancer");
 
     nbElements=nbElementsSelection; //prend en compte le nombre d'éléments choisi dans le sélecteur
     this.A = new int[nbElements]; //vecteur original (non trié)
@@ -379,7 +379,7 @@ void triParSelection() {
       sine.stop();
     }
     text("Le vecteur a été trié en "+ str(stopTime-startTime)+ "ms !", 40, 650);
-    text("Nombre de comparaisons réalisées: " + str(nbComparaisons), 40, 700);
+    text("Nombre de comparaisons réalisées: " + str(nbComparaisons-1), 40, 700);
     text("Nombre d'échanges réalisés: "+str(nbEchanges), 40, 730);
     return;
   }
@@ -402,7 +402,7 @@ void triParSelection() {
     posCourante=posTri; // on replace le curseur en début de partie non triée
     posMinimum=posTri; // on replace le curseur min en début de partie non triée
   }
-  if (son) {
+  if (sonActif) {
     sine.freq(map(B[posCourante], 0, maxval, 80, 800)); //génère un son de fréquence proportionnelle à la valeur
   }
 
@@ -436,7 +436,7 @@ void triBulles() {
     nbPermutations=0; // reinitialise le compteur de permutation
   } else {
     posCourante++;
-    if (son) {
+    if (sonActif) {
       sine.freq(map(B[posCourante], 0, maxval, 80, 800)); //génère un son de fréquence proportionnelle à la valeur
     }
 
@@ -490,7 +490,7 @@ public void triRapide() {
     // `pIndex` est incrémenté, et cet élément est placé avant le pivot.
     if (posCourante <= ssVecEnd) {
 
-      if (son) {
+      if (sonActif) {
         //génère un son de fréquence proportionnelle à la valeur de l'élément en cours
         sine.freq(map(B[posCourante], 0, maxval, 80, 800));
       }
